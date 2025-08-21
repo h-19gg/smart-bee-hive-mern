@@ -25,5 +25,6 @@ app.get('/', (req,res)=> res.json({status:'Smart Bee Hive API running'}));
 app.use('/api/auth', authRoutes);
 app.use('/api/hives', hiveRoutes);
 app.use('/api/readings', readingRoutes);
-
-app.listen(PORT, ()=> console.log(`✅ API Server running on http://localhost:${PORT}`));
+app.listen(PORT, '0.0.0.0', ()=> 
+  console.log(`✅ API Server running on http://0.0.0.0:${PORT}`)
+);

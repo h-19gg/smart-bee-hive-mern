@@ -1,0 +1,5 @@
+# رابط قاعدة البيانات MongoDB Atlas
+MONGO_URI=mongodb+srv://hussein-22:B5ovF4ojJSlRYoIr@cluster0.ywknfhw.mongodb.net/
+
+# رقم البورت اللي راح يشغّل السيرفر
+PORT=5000
