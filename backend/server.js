@@ -1,3 +1,7 @@
+/***************************************************
+ * Smart Bee Hive Backend (Fixed & Ready)
+ * Connected to MongoDB Atlas + Render + Vercel
+ ***************************************************/
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -11,31 +15,43 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// إصلاح CORS - تحويل إلى مصفوفة إذا كان هناك قيم متعددة
+/* ✅ إعداد CORS للسماح بطلبات من Vercel Frontend */
 const CORS_ORIGIN = process.env.CORS_ORIGIN 
-  ? process.env.CORS_ORIGIN.split(',') 
-  : '*';
+  ? process.env.CORS_ORIGIN.split(',')
+  : ['https://smart-bee-hive-mern.vercel.app'];
 
-app.use(cors({ 
+app.use(cors({
   origin: CORS_ORIGIN,
-  credentials: true
+  credentials: true,
 }));
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/smartbeehive';
+/* ✅ إعداد اتصال قاعدة البيانات */
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://hussein-22:B5ovF4ojJSlRYoIr@cluster0.ywknfhw.mongodb.net/smart-bee-hive?retryWrites=true&w=majority';
 const PORT = process.env.PORT || 5000;
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(e => { 
-    console.error('❌ Mongo error', e.message); 
-    process.exit(1); 
+    console.error('❌ MongoDB connection error:', e.message);
+    process.exit(1);
   });
 
-app.get('/', (req, res) => res.json({ status: 'Smart Bee Hive API running' }));
+/* ✅ نقطة فحص عامة */
+app.get('/', (req, res) => {
+  res.json({ status: 'Smart Bee Hive API running' });
+});
+
+/* ✅ نقاط API */
 app.use('/api/auth', authRoutes);
 app.use('/api/hives', hiveRoutes);
 app.use('/api/readings', readingRoutes);
 
-app.listen(PORT, '0.0.0.0', () => 
-  console.log(`✅ API Server running on http://0.0.0.0:${PORT}`)
-);
+/* ✅ نقطة فحص جاهزية */
+app.get('/api/status', (req, res) => {
+  res.json({ status: 'OK', uptime: process.uptime() });
+});
+
+/* ✅ بدء السيرفر */
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Smart Bee Hive API Server running on port ${PORT}`);
+});
