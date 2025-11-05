@@ -22,7 +22,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/frontend/build/$1"
+      "destination": "/frontend/dist/$1"
     }
   ]
 }
