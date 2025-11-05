@@ -1,1 +1,4 @@
 .vercel
+
+# Ignore node_modules in all subdirectories
+**/node_modules
