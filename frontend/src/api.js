@@ -1,7 +1,46 @@
-// نستدعي الملف الذي أنشأناه
 import { supabase } from './supabaseClient';
 
-// هذه الدالة الجديدة ستقرأ آخر قراءة من Supabase
+// =======================================================
+// الجزء 1: دوال تسجيل الدخول (التي ستعمل على Vercel)
+// =======================================================
+
+// هذه هي الدالة التي يستخدمها App.jsx لتسجيل الدخول والإنشاء
+export const api = async (url, method, body, token) => {
+  try {
+    const options = {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    if (token) {
+      options.headers['Authorization'] = `Bearer ${token}`;
+    }
+    if (body) {
+      options.body = JSON.stringify(body);
+    }
+
+    // === هذا هو الإصلاح الأهم ===
+    // حذفنا رابط "Render"
+    // Vercel سيفهم أن '/api/...' يجب أن تذهب إلى الخادم الخلفي
+    const res = await fetch(url, options); // 'url' ستكون مثلاً '/api/auth/login'
+    
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || 'حدث خطأ ما');
+    }
+    return data;
+
+  } catch (err) {
+    console.error("API Error:", err);
+    throw err;
+  }
+};
+
+
+// =======================================================
+// الجزء 2: دالة جلب بيانات الحساسات (من Supabase)
+// =======================================================
 export const getLatestSensorData = async () => {
   try {
     // هذا هو الأمر لقراءة البيانات من جدولك
@@ -12,17 +51,14 @@ export const getLatestSensorData = async () => {
       .limit(1); // أعد آخر قراءة واحدة فقط
 
     if (error) {
-      // إذا حدث خطأ، أظهره في الكونسول
       console.error("Supabase read error:", error);
       throw error;
     }
 
     if (data && data.length > 0) {
-      // إذا نجح، أعد البيانات
-      return data[0];
+      return data[0]; // إذا نجح، أعد البيانات
     } else {
-      // إذا لم يجد بيانات
-      return null;
+      return null; // إذا لم يجد بيانات
     }
 
   } catch (error) {
@@ -30,8 +66,3 @@ export const getLatestSensorData = async () => {
     return null; // أعد "لا شيء" إذا فشل
   }
 };
-
-// --- ملاحظة ---
-// إذا كان لديك دوال أخرى في هذا الملف (مثل login, register)
-// اتركها كما هي ولا تحذفها.
-// فقط احذف الدالة القديمة التي كانت تجلب "بيانات الحساسات".
